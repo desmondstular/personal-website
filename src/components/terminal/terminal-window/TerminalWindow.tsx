@@ -10,11 +10,11 @@ import React, {useEffect, useRef, useState} from "react";
 import "./terminal-window.css"
 
 const TerminalWindow = () => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [history, setHistory] = useState<Array<string>>([])
   const userIdentifier: string = "des@ml-linux:/$ ";
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (inputRef.current) {
       const cursorPos: number | null = inputRef.current.selectionStart;
       const selectEnd: number | null = inputRef.current.selectionEnd;
