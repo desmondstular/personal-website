@@ -1,3 +1,32 @@
-.terminal-window {
+.terminal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 0;
+}
 
+.terminal-history-line {
+  all: unset;
+  text-align: left;
+}
+
+.terminal-input {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  max-height: 500px;
+}
+
+.terminal-input-name {
+
+}
+
+.terminal-input-text {
+  border: none;
+  background-color: transparent;
+  flex-grow: 1;
+}
+
+.terminal-input-text:focus {
+  outline: none;
 }

@@ -7,17 +7,26 @@
  * Date: February 2, 2025
  */
 import React, {useEffect, useRef, useState} from "react";
+import "./terminal-window.css"
 
 const TerminalWindow = () => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const userIdentifier: string = "des@ml-linux"
 
-  const [history, setHistory] = useState()
+  const [history, setHistory] = useState<Array<string>>([])
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       if (inputRef.current) {
         const inputValue = inputRef.current.value;
         console.log(inputValue);
+
+        if (inputValue === "clear") {
+          setHistory([]);
+        }
+        else {
+          setHistory([...history, inputValue]);
+        }
         inputRef.current.value = '';
       }
     }
@@ -26,7 +35,9 @@ const TerminalWindow = () => {
       if (inputRef.current) {
         const inputValue = inputRef.current.value;
         console.log(inputValue);
-        inputRef.current.value = '^C';
+        inputRef.current.value = '';
+        setHistory([...history, "^C"]);
+        inputRef.current.scrollIntoView({behavior: "smooth"});
         e.preventDefault()
       }
     }
@@ -44,8 +55,14 @@ const TerminalWindow = () => {
   }, []);
 
   return (
-    <div className="terminal-window">
-      <input className="terminal-text" ref={inputRef} type="text" onKeyDown={onKeyDown}/>
+    <div className="terminal">
+      {history.map(history => (
+        <p className="terminal-history-line">{userIdentifier}:/$ {history}</p>
+      ))}
+      <span className="terminal-input">
+        <text className="terminal-input-name">{userIdentifier}:/$ </text>
+        <input className="terminal-input-text" ref={inputRef} onKeyDown={onKeyDown}></input>
+      </span>
     </div>
   )
 }
