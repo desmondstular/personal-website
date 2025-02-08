@@ -11,38 +11,51 @@ import "./terminal-window.css"
 
 const TerminalWindow = () => {
   const inputRef = useRef<HTMLInputElement>(null);
-  const userIdentifier: string = "des@ml-linux"
-
   const [history, setHistory] = useState<Array<string>>([])
+  const userIdentifier: string = "des@ml-linux:/$ ";
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      if (inputRef.current) {
-        const inputValue = inputRef.current.value;
-        console.log(inputValue);
+    if (inputRef.current) {
+      if (e.key === "Enter") {
+        const inputValue = inputRef.current.value.split(userIdentifier)[1];
+
+        console.log(inputValue)
 
         if (inputValue === "clear") {
           setHistory([]);
-        }
-        else {
+        } else {
           setHistory([...history, inputValue]);
         }
-        inputRef.current.value = '';
+        inputRef.current.value = userIdentifier;
+        inputRef.current.scrollIntoView({behavior: "smooth"})
+        e.preventDefault()
       }
-    }
 
-    else if (e.ctrlKey && e.key === "c") {
-      if (inputRef.current) {
+      else if (e.ctrlKey && e.key === "c") {
         const inputValue = inputRef.current.value;
         console.log(inputValue);
         inputRef.current.value = '';
         setHistory([...history, "^C"]);
         inputRef.current.scrollIntoView({behavior: "smooth"});
-        e.preventDefault()
+        e.preventDefault();
+      }
+
+      else if (e.key === "Backspace") {
+        if (inputRef.current.value === userIdentifier) {
+          e.preventDefault();
+        }
       }
     }
   };
 
+  // On first render, it populates the text field with the user identifier
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.value = userIdentifier;
+    }
+  });
+
+  // Keep the text field in focus the entire time
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (inputRef.current) {
@@ -57,12 +70,16 @@ const TerminalWindow = () => {
   return (
     <div className="terminal">
       {history.map(history => (
-        <p className="terminal-history-line">{userIdentifier}:/$ {history}</p>
+        <p className="terminal-history-line">{userIdentifier} {history}</p>
       ))}
-      <span className="terminal-input">
-        <text className="terminal-input-name">{userIdentifier}:/$ </text>
-        <input className="terminal-input-text" ref={inputRef} onKeyDown={onKeyDown}></input>
-      </span>
+      <div className="terminal-input">
+        <input
+          className="terminal-input-field"
+          spellCheck="false"
+          ref={inputRef}
+          onKeyDown={onKeyDown}>
+        </input>
+      </div>
     </div>
   )
 }
