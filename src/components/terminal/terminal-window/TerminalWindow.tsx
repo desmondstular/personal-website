@@ -59,15 +59,15 @@ const TerminalWindow = () => {
         }
 
         // Ensure user cannot delete user identifier
-        else if (e.key === "Backspace" || e.key === "Delete") {
-          if (cursorPos <= userIdentifier.length) {
+        else if (cursorPos <= userIdentifier.length) {
+          if (e.key === "Backspace" || e.key === "Delete") {
             if (selectEnd <= userIdentifier.length) {
               e.preventDefault();
             }
-
-            // Reset cursor to start of input field
-            inputRef.current.selectionStart = userIdentifier.length;
           }
+
+          // Reset cursor to start of input field
+          inputRef.current.selectionStart = userIdentifier.length;
         }
       }
     }
