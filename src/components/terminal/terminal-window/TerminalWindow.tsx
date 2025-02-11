@@ -12,6 +12,8 @@ import "./terminal-window.css"
 const TerminalWindow = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [history, setHistory] = useState<Array<string>>([])
+  const [historyDisplay, setHistoryDisplay] = useState<Array<string>>([])
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
   const userIdentifier: string = "des@ml-linux:/$ ";
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -28,11 +30,18 @@ const TerminalWindow = () => {
 
           // Clear history command
           if (inputValue === "clear") {
-            setHistory([]);
-          } else {
+            setHistoryDisplay([]);
+          }
+          // if blank enter, show on display history but don't store in history
+          else if (inputValue === "") {
+            setHistoryDisplay([...historyDisplay, inputValue]);
+          }
+          else {
             setHistory([...history, inputValue]);
+            setHistoryDisplay([...historyDisplay, inputValue]);
           }
 
+          setHistoryIndex(-1);
           inputRef.current.value = userIdentifier;
           inputRef.current.scrollIntoView({behavior: "smooth"})
           e.preventDefault()
@@ -52,10 +61,26 @@ const TerminalWindow = () => {
           // If trying to send ctrl+c stop command
           else {
             inputRef.current.value = '';
-            setHistory([...history, `${inputValue}^C`]);
+            setHistoryDisplay([...historyDisplay, `${inputValue}^C`]);
             inputRef.current.scrollIntoView({behavior: "smooth"});
             e.preventDefault();
           }
+        }
+
+        // if pushing up arrow to cycle up history order
+        else if (e.key === 'ArrowUp') {
+          if (historyIndex < history.length - 1) {
+            setHistoryIndex(historyIndex + 1); // Move up in history
+          }
+          e.preventDefault();
+        }
+
+        // if pushing down arrow to cycle down history order
+        else if (e.key === 'ArrowDown') {
+          if (historyIndex !== -1) {
+            setHistoryIndex(historyIndex - 1);
+          }
+          e.preventDefault();
         }
 
         // Ensure user cannot delete user identifier
@@ -92,9 +117,23 @@ const TerminalWindow = () => {
 
   }, []);
 
+  // Re-renders input field with history when cycling up/down arrows
+  useEffect(() => {
+    if (inputRef.current) {
+      switch (historyIndex) {
+        case -1:
+          inputRef.current.value = userIdentifier;
+          break;
+
+        default:
+          inputRef.current.value = `${userIdentifier}${history[historyIndex]}`;
+      }
+    }
+  }, [historyIndex]);
+
   return (
     <div className="terminal">
-      {history.map(history => (
+      {historyDisplay.map(history => (
         <p className="terminal-history-line">{userIdentifier} {history}</p>
       ))}
       <div className="terminal-input">
@@ -103,7 +142,6 @@ const TerminalWindow = () => {
           spellCheck="false"
           ref={inputRef}
           onKeyDown={onKeyDown}>
-
         </textarea>
       </div>
     </div>
