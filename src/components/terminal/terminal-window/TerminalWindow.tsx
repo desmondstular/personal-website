@@ -13,7 +13,7 @@ const TerminalWindow = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [history, setHistory] = useState<Array<string>>([])
   const [historyDisplay, setHistoryDisplay] = useState<Array<string>>([])
-  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [historyIndex, setHistoryIndex] = useState<number>(1);
   const userIdentifier: string = "des@ml-linux:/$ ";
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -39,9 +39,9 @@ const TerminalWindow = () => {
           else {
             setHistory([...history, inputValue]);
             setHistoryDisplay([...historyDisplay, inputValue]);
+            setHistoryIndex(history.length > 0 ? history.length : 1);
           }
 
-          setHistoryIndex(-1);
           inputRef.current.value = userIdentifier;
           inputRef.current.scrollIntoView({behavior: "smooth"})
           e.preventDefault()
@@ -68,17 +68,17 @@ const TerminalWindow = () => {
         }
 
         // if pushing up arrow to cycle up history order
-        else if (e.key === 'ArrowUp') {
-          if (historyIndex < history.length - 1) {
-            setHistoryIndex(historyIndex + 1); // Move up in history
+        else if (e.key === 'ArrowDown') {
+          if (historyIndex < history.length) {
+            setHistoryIndex(historyIndex + 1); // Move to more recent history
           }
           e.preventDefault();
         }
 
         // if pushing down arrow to cycle down history order
-        else if (e.key === 'ArrowDown') {
-          if (historyIndex !== -1) {
-            setHistoryIndex(historyIndex - 1);
+        else if (e.key === 'ArrowUp') {
+          if (historyIndex > 1) {
+            setHistoryIndex(historyIndex - 1);  // most to less recent history
           }
           e.preventDefault();
         }
@@ -120,12 +120,10 @@ const TerminalWindow = () => {
   // Re-renders input field with history when cycling up/down arrows
   useEffect(() => {
     if (inputRef.current) {
-      switch (historyIndex) {
-        case -1:
-          inputRef.current.value = userIdentifier;
-          break;
-
-        default:
+      if (historyIndex >= history.length) {
+        inputRef.current.value = userIdentifier;
+      }
+      else {
           inputRef.current.value = `${userIdentifier}${history[historyIndex]}`;
       }
     }
