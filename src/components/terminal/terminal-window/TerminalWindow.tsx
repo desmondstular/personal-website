@@ -37,9 +37,9 @@ const TerminalWindow = () => {
             setHistoryDisplay([...historyDisplay, inputValue]);
           }
           else {
+            setHistoryIndex(history.length + 1);
             setHistory([...history, inputValue]);
             setHistoryDisplay([...historyDisplay, inputValue]);
-            setHistoryIndex(history.length > 0 ? history.length : 1);
           }
 
           inputRef.current.value = userIdentifier;
@@ -59,7 +59,7 @@ const TerminalWindow = () => {
           }
 
           // If trying to send ctrl+c stop command
-          else {
+          else if (e.ctrlKey) {
             inputRef.current.value = '';
             setHistoryDisplay([...historyDisplay, `${inputValue}^C`]);
             inputRef.current.scrollIntoView({behavior: "smooth"});
@@ -77,7 +77,7 @@ const TerminalWindow = () => {
 
         // if pushing down arrow to cycle down history order
         else if (e.key === 'ArrowUp') {
-          if (historyIndex > 1) {
+          if (historyIndex > 0) {
             setHistoryIndex(historyIndex - 1);  // most to less recent history
           }
           e.preventDefault();
@@ -112,9 +112,7 @@ const TerminalWindow = () => {
         inputRef.current.focus();
       }
     }, 50);
-
     return () => clearInterval(intervalId);
-
   }, []);
 
   // Re-renders input field with history when cycling up/down arrows
